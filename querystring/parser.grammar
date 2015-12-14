@@ -1,0 +1,230 @@
+{
+  function buildSchema(pv_) {
+    var schema = {}
+
+    function normalize(p) {
+      return p.slice(1).split(':').map(decodeURIComponent)
+    }
+
+    pv_.forEach(function (pv) {
+      var target = schema
+      var path = normalize(pv[0])
+      var last = path.pop()
+      path.forEach(function (key) {
+        // TODO: test for existing key and wrap in an `allOf`
+        target = target[key] = target[key] || {}
+      })
+      target[last] = pv[1]
+    })
+
+    return schema
+  }
+}
+
+Query
+  = '?' s:Phrase { return s }
+
+Phrase
+  = DisjunctiveTerm
+  / ConjunctiveTerm
+  / SchemaTerm
+
+SchemaTerm
+  = SchemaExpression
+  / AssertionTerm
+
+SchemaExpression
+  = NegationExpression // TODO: variadic negation
+  / ExclusiveExpression // unique existential quantification
+  / DisjunctionExpression // existential quantification
+  / ConjunctionExpression // universal quantification
+  / UnaryExpression
+
+UnaryExpression
+  = '(' s:SchemaTerm ')' { return s }
+
+NegationExpression
+  = '!' s:SchemaExpression { return { not: s } }
+
+ExclusiveExpression
+  = '^' s:DisjunctionExpression { return { oneOf: s.anyOf } }
+
+DisjunctionExpression
+  = '(' s:DisjunctiveTerm ')' { return s }
+
+ConjunctionExpression
+  = '(' s:ConjunctiveTerm ')' { return s }
+
+DisjunctiveTerm
+  = head:SchemaTerm tail:DisjunctivePart+ ','? {
+    return { anyOf: [ head ].concat(tail) }
+  }
+
+DisjunctivePart
+  = ',' s:SchemaTerm { return s }
+
+ConjunctiveTerm
+  = head:SchemaTerm tail:ConjunctivePart+ {
+    return { allOf: [ head ].concat(tail) }
+  }
+
+ConjunctivePart
+  = ';'+ s:SchemaTerm { return s }
+
+AssertionTerm
+  = pv:Assertion {
+    return buildSchema([ pv ])
+  }
+
+AssertivePhrase
+  = head:Assertion tail:AssertiveTerm* ';'? {
+    return [ head ].concat(tail)
+  }
+
+AssertiveTerm
+  = ';' pv:Assertion { return pv }
+
+Assertion
+  = ItemsSchemaAssertion
+  / NegatedValueAssertion
+  / EnumValueAssertion
+  / PropertySchemaAssertion
+  / ConstantValueAssertion
+  / ConstraintValueAssertion
+
+ItemsSchemaAssertion
+  = p:PropertyPath '=*' s:SchemaExpression { return [ p, { items: s } ] }
+
+NegatedValueAssertion
+  = p:PropertyPath '!=' s:ConstantValue { return [ p, { not: s } ] }
+
+EnumValueAssertion
+  = p:PropertyPath '=+' v_:TupleTerm { return [ p, { enum: v_ } ] }
+
+PropertySchemaAssertion
+  = p:PropertyPath '=' s:SchemaExpression { return [ p, s ] }
+
+ConstantValueAssertion
+  = p:PropertyPath '=' s:ConstantValue { return [ p, s ] }
+
+ConstraintValueAssertion
+  = p:ConstraintPath '=' s:ConstraintValue { return [ p, s ] }
+
+ConstraintValue 'constraint value'
+  = ValueTerm
+
+ConstantValue 'constant'
+  = v:ValueTerm { return { constant: v } }
+
+ValueTerm 'value'
+  = TupleTerm
+  / LiteralTerm
+
+LiteralTerm 'literal'
+  = LiteralNull
+  / LiteralFalse
+  / LiteralTrue
+  / LiteralNumber
+  / LiteralString
+
+TupleTerm 'tuple'
+  = '()' { return [] }
+  / '(' head:TupleElement tail:TuplePart* ','? ')' {
+    return [ head ].concat(tail)
+  }
+
+TuplePart
+  = ',' v:TupleElement { return v }
+
+TupleElement
+  = ValueTerm
+
+LiteralNull 'null value'
+  = ':null' { return null }
+
+LiteralFalse 'false value'
+  = ':false' { return false }
+
+LiteralTrue 'true value'
+  = ':true' { return true }
+
+LiteralNumber 'number value'
+  = ':' v:$Number { console.log('xxx', v); return Number(v) }
+  / ':' '+'? 'Infinity' { return Infinity }
+  / ':-Infinity' { return -Infinity }
+
+Number
+  = (IntegerPart FractionalPart ExponentPart)
+  / (IntegerPart ExponentPart)
+  / (IntegerPart FractionalPart)
+  / (IntegerPart)
+
+IntegerPart
+  = Digits
+  / (Minus Digits)
+  / (Plus Digits)
+
+FractionalPart
+  = '.' Digits
+
+ExponentPart
+  = ExponentDelimiter Digits
+
+Digits
+  = [0-9]+
+
+ExponentDelimiter
+  = ([Ee] Minus)
+  / ([Ee] Plus)
+  / [Ee]
+
+Plus
+  = '+'
+  / '%2B'
+  / '%2b'
+
+Minus
+  = '-'
+
+LiteralString 'string value'
+  = c:LiteralStringCharacter+ { return c.join('') }
+
+ConstraintPath
+  = p:$ConstraintPathCharacter* {
+    if (p[0] !== ':') p = '/' + p
+    return p.replace(/\//g, ':properties:')
+  }
+
+PropertyPath
+  = p:$PropertyPathCharacter* {
+    return ('/' + p).replace(/\//g, ':properties:')
+  }
+
+ConstraintPathCharacter
+  = ConstraintPathDelimiter
+  / PropertyPathCharacter
+
+PropertyPathCharacter
+  = PropertyPathDelimiter
+  / UnreservedCharacter
+
+LiteralStringCharacter
+  = '+' { return ' ' }
+  / [:/@!*$& ^]
+  / UnreservedCharacter
+
+ConstraintPathDelimiter
+  = ':'
+
+PropertyPathDelimiter
+  = '/'
+
+UnreservedCharacter
+  = [a-zA-Z0-9\-\._~]
+  / EscapedCharacter
+
+EscapedCharacter
+  = s:$('%' HexDigit HexDigit) { return decodeURIComponent(s) }
+
+HexDigit
+  = [0-9a-fA-F]

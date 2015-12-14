@@ -1,0 +1,44 @@
+{
+  "name": "@query/schema",
+  "version": "0.0.0",
+  "description": "Concise querystring-safe schema language which maps coherently to JSON Schema",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test | faucet",
+    "build": "npm run build:parser",
+    "build:parser": "pegjs querystring/parser.grammar"
+  },
+  "repository": {
+    "type": "git",
+    "url": "deanlandolt/query-schema"
+  },
+  "keywords": [
+    "bytewise",
+    "uri",
+    "key",
+    "paths",
+    "tuplespace"
+  ],
+  "author": "Dean Landolt <dean@deanlandolt.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/deanlandolt/query-schema/issues"
+  },
+  "homepage": "https://github.com/deanlandolt/query-schema#readme",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "ajv": "^2.2.2",
+    "through2": "^2.0.0"
+  },
+  "devDependencies": {
+    "faucet": "0.0.1",
+    "pegjs": "^0.9.0",
+    "tape": "^4.2.2"
+  },
+  "optionalDependencies": {
+    "sacjs": "^1.0.0",
+    "semver": "^5.1.0"
+  }
+}
