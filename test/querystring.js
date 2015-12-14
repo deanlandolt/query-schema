@@ -21,6 +21,14 @@ function throws(t, q, m) {
   }, m)
 }
 
+test('empty', function (t) {
+  eq(t, '?', {})
+  // eq(t, '?()', {})
+  // eq(t, '?(((())))', {})
+
+  t.end()
+})
+
 test('constants', function (t) {
   eq(t, '?year=2003', {
     properties: {

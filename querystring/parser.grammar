@@ -23,6 +23,7 @@
 
 Query
   = '?' s:Phrase { return s }
+  / '?' { return {} }
 
 Phrase
   = DisjunctiveTerm
