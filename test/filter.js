@@ -1,6 +1,6 @@
 var test = require('tape')
 var through2 = require('through2')
-var filter = require('../filter')
+var filterStream = require('../filter').stream
 
 var colors = [
   'aliceblue',
@@ -266,7 +266,7 @@ function run(t, q, expected) {
   var source = through2.obj()
 
   var values = []
-  source.pipe(filter.stream('?' + q)).on('data', function (d) {
+  source.pipe(filterStream('?' + q)).on('data', function (d) {
     values.push(d.value.name)
   })
   .on('error', t.end)
