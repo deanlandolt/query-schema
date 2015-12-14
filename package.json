@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm run build:parser",
     "build:parser": "pegjs querystring/parser.grammar",
+    "lint": "standard",
     "prepublish": "npm run build",
     "release:minor": "npm version minor && npm publish && git push --follow-tags",
     "release:patch": "npm version patch && npm publish && git push --follow-tags",
@@ -16,11 +17,10 @@
     "url": "deanlandolt/query-schema"
   },
   "keywords": [
-    "bytewise",
-    "uri",
-    "key",
-    "paths",
-    "tuplespace"
+    "schema",
+    "query",
+    "jsonschema",
+    "querystring"
   ],
   "author": "Dean Landolt <dean@deanlandolt.com>",
   "license": "MIT",
@@ -39,6 +39,7 @@
     "faucet": "0.0.1",
     "pegjs": "^0.9.0",
     "semver": "^5.1.0",
+    "standard": "^5.4.1",
     "tape": "^4.2.2"
   },
   "optionalDependencies": {
