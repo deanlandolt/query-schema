@@ -1,6 +1,10 @@
 # @query/schema
 
-This lib provides a querystring-safe format with a syntax that maps coherently to JSON Schema. The goal is to define a concise but fully generic notation for defining filters and projections over any collection, index or stream of events, making it possible to describe arbitrarily complex queries over any stream of JSON-serializable objects.
+[![build status](https://travis-ci.org/deanlandolt/query-schema.svg?branch=master)](https://travis-ci.org/deanlandolt/query-schema)
+
+This lib provides a querystring-safe format with a syntax that maps coherently to JSON Schema.
+
+The aim is to define a concise but fully generic notation for defining filters and projections over any collection, index or stream of events, making it possible to describe arbitrarily complex queries over any stream of JSON-serializable objects.
 
 
 ## Query syntax
