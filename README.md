@@ -301,9 +301,9 @@ TODO
 ## Stream filters
 
 ```js
-var queryStream = require('@query/schema/filter')(db)
+var filter = require('@query/schema/filter').value('year:gt=2003')
 
-queryStream('year:gt=2003').on('data', function (data) {
+db.createReadStream(...).pipe(filter).on('data', function (data) {
   // for all records:
   //  data.value.year > '2003'
 })

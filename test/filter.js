@@ -1,6 +1,6 @@
 var test = require('tape')
 var through2 = require('through2')
-var filterStream = require('../filter').stream
+var ValueFilter = require('../filter').value
 
 var colors = [
   'aliceblue',
@@ -262,11 +262,11 @@ var queries = {
   ]
 }
 
-function run(t, q, expected) {
+function run(t, qs, expected) {
   var source = through2.obj()
 
   var values = []
-  source.pipe(filterStream('?' + q)).on('data', function (d) {
+  source.pipe(ValueFilter('?' + qs)).on('data', function (d) {
     values.push(d.value.name)
   })
   .on('error', t.end)
@@ -292,9 +292,15 @@ function run(t, q, expected) {
 }
 
 test('stream filtering', function (t) {
-  Object.keys(queries).forEach(function (q) {
-    t.test(q, function (t) {
-      run(t, q, queries[q])
+  t.test('empty query', function (t) {
+    t.test('', function (t) {
+      run(t, '', colors)
+    })
+  })
+
+  Object.keys(queries).forEach(function (qs) {
+    t.test(qs, function (t) {
+      run(t, qs, queries[qs])
     })
   })
 })
