@@ -1,6 +1,6 @@
 {
   "name": "@query/schema",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Concise querystring-safe schema language which maps coherently to JSON Schema",
   "main": "index.js",
   "scripts": {
