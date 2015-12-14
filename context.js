@@ -40,6 +40,65 @@ context.addFormat('undefined', {
   compare: function (a, b) { return a > b ? 1 : (a < b ? -1 : 0) },
 })
 
+// ltgt macros
+function ltgtKeyword(op) {
+  var minimum = op[0] === 'g'
+  var exclusive = op[2] !== 'e'
+
+  context.addKeyword(op, {
+    macro: function (value) {
+      var suffix = (minimum ? 'in' : 'ax') + 'imum'
+
+      var valKey, excKey
+      if (typeof value === 'number') {
+        valKey = 'm' + suffix
+        excKey = 'exclusiveM' + suffix
+      }
+      // TODO: else if (typeof value === '...')?
+      else {
+        valKey = 'formatM' + suffix
+        excKey = 'exclusiveFormatM' + suffix
+      }
+
+      var schema = {}
+      schema[valKey] = value
+      schema[excKey] = exclusive
+      return schema
+    }
+  })
+}
+
+ltgtKeyword('gte')
+ltgtKeyword('gt')
+ltgtKeyword('lt')
+ltgtKeyword('lte')
+
+// eq, ne macros
+context.addKeyword('eq', {
+  macro: function (schema) {
+    return { constant: schema }
+  }
+})
+context.addKeyword('ne', {
+  macro: function (schema) {
+    return { not: { eq: schema } }
+  }
+})
+
+// size macro
+context.addKeyword('size', {
+  macro: function (schema) {
+    return {
+      minLength: schema,
+      maxLength: schema,
+      minItems: schema,
+      maxItems: schema,
+      minProperties: schema,
+      maxProperties: schema
+    }
+  }
+})
+
 
 try {
   var semver = require('semver')

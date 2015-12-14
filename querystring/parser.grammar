@@ -30,10 +30,10 @@ Phrase
   / SchemaTerm
 
 SchemaTerm
-  = SchemaExpression
-  / AssertionTerm
+  = CompoundExpression
+  / AssertionExpression
 
-SchemaExpression
+CompoundExpression
   = NegationExpression // TODO: variadic negation
   / ExclusiveExpression // unique existential quantification
   / DisjunctionExpression // existential quantification
@@ -44,7 +44,7 @@ UnaryExpression
   = '(' s:SchemaTerm ')' { return s }
 
 NegationExpression
-  = '!' s:SchemaExpression { return { not: s } }
+  = '!' s:CompoundExpression { return { not: s } }
 
 ExclusiveExpression
   = '^' s:DisjunctionExpression { return { oneOf: s.anyOf } }
@@ -71,43 +71,54 @@ ConjunctiveTerm
 ConjunctivePart
   = ';'+ s:SchemaTerm { return s }
 
-AssertionTerm
-  = pv:Assertion {
+AssertionExpression
+  = pv:AssertionTerm {
     return buildSchema([ pv ])
   }
 
-AssertivePhrase
-  = head:Assertion tail:AssertiveTerm* ';'? {
+AssertiveTerm
+  = head:AssertionTerm tail:AssertivePart* ';'? {
     return [ head ].concat(tail)
   }
 
-AssertiveTerm
-  = ';' pv:Assertion { return pv }
+AssertivePart
+  = ';' pv:AssertionTerm { return pv }
 
-Assertion
-  = ItemsSchemaAssertion
-  / NegatedValueAssertion
-  / EnumValueAssertion
-  / PropertySchemaAssertion
-  / ConstantValueAssertion
-  / ConstraintValueAssertion
+AssertionTerm
+  = AssertOptionalItemsSchema
+  / AssertItemsSchema
+  / AssertNegatedValue
+  / AssertEnumValue
+  / AssertPropertySchema
+  / AssertOptionalConstantValue
+  / AssertConstantValue
+  / AssertConstraintValue
 
-ItemsSchemaAssertion
-  = p:PropertyPath '=*' s:SchemaExpression { return [ p, { items: s } ] }
+AssertOptionalItemsSchema
+  = p:PropertyPath '?=*' s:CompoundExpression { return [ p, { items: s } ] }
 
-NegatedValueAssertion
+AssertItemsSchema
+  = p:PropertyPath '=*' s:CompoundExpression { return [ p, { items: s }, true ] }
+
+AssertNegatedValue
   = p:PropertyPath '!=' s:ConstantValue { return [ p, { not: s } ] }
 
-EnumValueAssertion
-  = p:PropertyPath '=+' v_:TupleTerm { return [ p, { enum: v_ } ] }
+AssertOptionalEnumValue
+  = p:PropertyPath '?=+' v_:TupleTerm { return [ p, { enum: v_ } ] }
 
-PropertySchemaAssertion
-  = p:PropertyPath '=' s:SchemaExpression { return [ p, s ] }
+AssertEnumValue
+  = p:PropertyPath '=+' v_:TupleTerm { return [ p, { enum: v_ }, true ] }
 
-ConstantValueAssertion
-  = p:PropertyPath '=' s:ConstantValue { return [ p, s ] }
+AssertPropertySchema
+  = p:PropertyPath '=' s:CompoundExpression { return [ p, s ] }
 
-ConstraintValueAssertion
+AssertOptionalConstantValue
+  = p:PropertyPath '?=' s:ConstantValue { return [ p, s ] }
+
+AssertConstantValue
+  = p:PropertyPath '=' s:ConstantValue { return [ p, s, true ] }
+
+AssertConstraintValue
   = p:ConstraintPath '=' s:ConstraintValue { return [ p, s ] }
 
 ConstraintValue 'constraint value'
@@ -149,7 +160,7 @@ LiteralTrue 'true value'
   = ':true' { return true }
 
 LiteralNumber 'number value'
-  = ':' v:$Number { console.log('xxx', v); return Number(v) }
+  = ':' v:$Number { return Number(v) }
   / ':' '+'? 'Infinity' { return Infinity }
   / ':-Infinity' { return -Infinity }
 

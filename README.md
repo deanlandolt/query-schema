@@ -1,8 +1,8 @@
 # @query/schema
 
-This lib provides a querystring-safe format with a syntax that maps coherently to JSON Schema. This allows for a concise notation for defining filters and projections over various collections, and makes it possible to add the capability of arbitrarily complex querying over any JSON stream.
+This lib provides a querystring-safe format with a syntax that maps coherently to JSON Schema. The goal is to define a concise but fully generic notation for defining filters and projections over any collection, index or stream of events, making it possible to describe arbitrarily complex queries over any stream of JSON-serializable objects.
 
-### Basic queries
+## Querystring schemas
 
 Simple queries look something like this:
 
@@ -117,7 +117,7 @@ This schema should work in any v5 JSON Schema validator.
 The standard `ltgt` options are defined as schema macros which transform into the JSON Schema (v5) `format*` keywords with appropriate values. For instance the `gte` macro is defined like this:
 
 ```js
-ajv.addKeyword('gt', {
+context.addKeyword('gt', {
   macro: function (schema, parentSchema) {
     return {
       formatMinimum: schema,
@@ -132,7 +132,7 @@ ajv.addKeyword('gt', {
 A macro is also defined for the `eq` keyword, aliasing the `constant` keyword:
 
 ```js
-ajv.addKeyword('eq', {
+context.addKeyword('eq', {
   macro: function (schema, parentSchema) {
     return { constant: schema }
   }
@@ -142,7 +142,7 @@ ajv.addKeyword('eq', {
 The `ne` macro is also defined, based on the `eq` macro and the standard JSON Schema `not` keyword:
 
 ```js
-ajv.addKeyword('ne', {
+context.addKeyword('ne', {
   macro: function (schema, parentSchema) {
     return { not: { eq: schema } }
   }
@@ -154,7 +154,7 @@ ajv.addKeyword('ne', {
 The `size` macro is defined to expand into the standard JSON Schema `*Length` keywords. The `size` of both strings and arrays can be asserted, as well as the total number of object keys, using this one macro:
 
 ```js
-ajv.addKeyword('size', {
+context.addKeyword('size', {
   macro: function (schema, parentSchema) {
     return {
       minLength: schema,

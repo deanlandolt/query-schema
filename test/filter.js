@@ -3,60 +3,298 @@ var through2 = require('through2')
 var filter = require('../filter')
 
 var colors = [
-  'chocolate',
+  'aliceblue',
+  'antiquewhite',
+  'aqua',
+  'aquamarine',
   'azure',
   'beige',
-  'aliceblue',
-  'aquamarine',
-  'chartreuse',
   'bisque',
   'black',
   'blanchedalmond',
   'blue',
-  'cyan',
   'blueviolet',
+  'brown',
   'burlywood',
   'cadetblue',
+  'chartreuse',
+  'chocolate',
   'coral',
   'cornflowerblue',
-  'brown',
-  'aqua',
   'cornsilk',
   'crimson',
-  'antiquewhite'
+  'cyan',
+  'darkblue',
+  'darkcyan',
+  'darkgoldenrod',
+  'darkgray',
+  'darkgreen',
+  'darkkhaki',
+  'darkmagenta',
+  'darkolivegreen',
+  'darkorange',
+  'darkorchid',
+  'darkred',
+  'darksalmon',
+  'darkseagreen',
+  'darkslateblue',
+  'darkslategray',
+  'darkturquoise',
+  'darkviolet',
+  'deeppink',
+  'deepskyblue',
+  'dimgray',
+  'dodgerblue',
+  'firebrick',
+  'floralwhite',
+  'forestgreen',
+  'fuchsia',
+  'gainsboro',
+  'ghostwhite',
+  'gold',
+  'goldenrod',
+  'gray',
+  'green',
+  'greenyellow',
+  'honeydew',
+  'hotpink',
+  'indianred',
+  'indigo',
+  'ivory',
+  'khaki',
+  'lavender',
+  'lavenderblush',
+  'lawngreen',
+  'lemonchiffon',
+  'lightblue',
+  'lightcoral',
+  'lightcyan',
+  'lightgoldenrodyellow',
+  'lightgray',
+  'lightgreen',
+  'lightpink',
+  'lightsalmon',
+  'lightseagreen',
+  'lightskyblue',
+  'lightslategray',
+  'lightsteelblue',
+  'lightyellow',
+  'lime',
+  'limegreen',
+  'linen',
+  'magenta',
+  'maroon',
+  'mediumaquamarine',
+  'mediumblue',
+  'mediumorchid',
+  'mediumpurple',
+  'mediumseagreen',
+  'mediumslateblue',
+  'mediumspringgreen',
+  'mediumturquoise',
+  'mediumvioletred',
+  'midnightblue',
+  'mintcream',
+  'mistyrose',
+  'moccasin',
+  'navajowhite',
+  'navy',
+  'oldlace',
+  'olive',
+  'olivedrab',
+  'orange',
+  'orangered',
+  'orchid',
+  'palegoldenrod',
+  'palegreen',
+  'paleturquoise',
+  'palevioletred',
+  'papayawhip',
+  'peachpuff',
+  'peru',
+  'pink',
+  'plum',
+  'powderblue',
+  'purple',
+  'rebeccapurple',
+  'red',
+  'rosybrown',
+  'royalblue',
+  'saddlebrown',
+  'salmon',
+  'sandybrown',
+  'seagreen',
+  'seashell',
+  'sienna',
+  'silver',
+  'skyblue',
+  'slateblue',
+  'slategray',
+  'snow',
+  'springgreen',
+  'steelblue',
+  'tan',
+  'teal',
+  'thistle',
+  'tomato',
+  'turquoise',
+  'violet',
+  'wheat',
+  'white',
+  'whitesmoke',
+  'yellow',
+  'yellowgreen'
 ]
 
-var colors_b = [
-  'beige',
-  'bisque',
-  'black',
-  'blanchedalmond',
-  'blue',
-  'blueviolet',
-  'burlywood',
-  'brown'
-]
+var queries = {
+  'name=white': [
+    'white'
+  ],
+  'name=+(yellow,white)': [
+    'white',
+    'yellow'
+  ],
+  'name=(yellow,white)': [
+  ],
+  'name=yellow,(name:pattern=^white)': [
+    'white',
+    'whitesmoke',
+    'yellow'
+  ],
+  'name:pattern=^bl': [
+    'black',
+    'blanchedalmond',
+    'blue',
+    'blueviolet',
+  ],
+  'name:pattern=^blue': [
+    'blue',
+    'blueviolet'
+  ],
+  'name:pattern=^brown': [
+    'brown'
+  ],
+  'name:pattern=brown': [
+    'brown',
+    'rosybrown',
+    'saddlebrown',
+    'sandybrown'
+  ],
+  'name:pattern=^b.*d$': [
+    'blanchedalmond',
+    'burlywood'
+  ],
+  'name:gt=white': [
+    'whitesmoke',
+    'yellow',
+    'yellowgreen'
+  ],
+  'name:gte=white': [
+    'white',
+    'whitesmoke',
+    'yellow',
+    'yellowgreen'
+  ],
+  'name:lt=bl': [
+    'aliceblue',
+    'antiquewhite',
+    'aqua',
+    'aquamarine',
+    'azure',
+    'beige',
+    'bisque'
+  ],
+  'name:lte=aqua': [
+    'aliceblue',
+    'antiquewhite',
+    'aqua'
+  ],
+  'name:lt=aqua': [
+    'aliceblue',
+    'antiquewhite'
+  ],
+  'name_len:gte=:15': [
+    'lightgoldenrodyellow',
+    'mediumaquamarine',
+    'mediumslateblue',
+    'mediumspringgreen',
+    'mediumturquoise',
+    'mediumvioletred'
+  ],
+  'name_len:gt=:15': [
+    'lightgoldenrodyellow',
+    'mediumaquamarine',
+    'mediumspringgreen'
+  ],
+  'name_len:lt=:4': [
+    'red',
+    'tan'
+  ],
+  'name_len:lte=:4': [
+    'aqua',
+    'blue',
+    'cyan',
+    'gold',
+    'gray',
+    'lime',
+    'navy',
+    'peru',
+    'pink',
+    'plum',
+    'red',
+    'snow',
+    'tan',
+    'teal'
+  ],
+  'name_len:lt=:4,name:pattern=^r': [
+    'rebeccapurple',
+    'red',
+    'rosybrown',
+    'royalblue',
+    'tan'
+  ],
+  'name_len:lt=:4;name:pattern=^r': [
+    'red'
+  ],
+  'name_len:lt=:4;(name:pattern=^r,name=tan)': [
+    'red',
+    'tan'
+  ]
+}
 
-test('stream filtering', function (t) {
+function run(t, q, expected) {
   var source = through2.obj()
 
   var values = []
-  source.pipe(filter.stream('?color:pattern=^b')).on('data', function (d) {
-    values.push(d.value.color)
+  source.pipe(filter.stream('?' + q)).on('data', function (d) {
+    values.push(d.value.name)
   })
+  .on('error', t.end)
   .on('end', function () {
-    t.deepEqual(values, colors_b)
+    t.deepEqual(values, expected)
     t.end()
   })
 
   function next(i) {
     if (i >= colors.length) return source.end()
-    source.push({ key: i, value: { color: colors[i] } })
-    setTimeout(function () {
+
+    var color = colors[i]
+    source.push({ key: i, value: {
+      name: color,
+      name_len: color.length
+    } })
+    process.nextTick(function () {
       next(++i)
-    }, Math.random())
+    })
   }
 
   next(0)
+}
 
+test('stream filtering', function (t) {
+  Object.keys(queries).forEach(function (q) {
+    t.test(q, function (t) {
+      run(t, q, queries[q])
+    })
+  })
 })
