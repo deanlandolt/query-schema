@@ -7,6 +7,7 @@
     "build": "npm run build:parser",
     "build:parser": "pegjs querystring/parser.grammar",
     "prepublish": "npm run build",
+    "release:minor": "npm version minor && npm publish && git push --follow-tags",
     "release:patch": "npm version patch && npm publish && git push --follow-tags",
     "test": "tape test | faucet"
   },
