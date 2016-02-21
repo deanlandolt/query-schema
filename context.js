@@ -53,8 +53,9 @@ catch (err) {
 var context = module.exports = ajv(defaults)
 
 // support format comparison on basic strings (no format defined)
-context.addFormat('undefined', {
+context.addFormat('lexicographical', {
   validate: function () { return true },
+  // TODO: add something like typewise sorting?
   compare: function (a, b) { return a > b ? 1 : (a < b ? -1 : 0) },
 })
 
@@ -81,6 +82,8 @@ function ltgtKeyword(op) {
       var schema = {}
       schema[valKey] = value
       schema[excKey] = exclusive
+
+      if (!schema.format) schema.format = 'lexicographical'
       return schema
     }
   })

@@ -32,7 +32,7 @@
     "test": "test"
   },
   "dependencies": {
-    "ajv": "^2.5.0",
+    "ajv": "^3.7.0",
     "through2": "^2.0.0"
   },
   "devDependencies": {
