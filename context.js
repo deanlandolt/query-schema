@@ -1,23 +1,41 @@
 var ajv = require('ajv')
 
 var defaults = {
-  allErrors:        true, // false
-  removeAdditional: false, // false
-  verbose:          true, // false
-  format:           'fast', // 'fast'
-  formats:          {}, // {}
-  schemas:          {}, // {}
-  meta:             true, // true
-  validateSchema:   'log', // true
-  inlineRefs:       true, // true
-  missingRefs:      true, // true
-  uniqueItems:      true, // true
-  unicode:          true, // true
-  beautify:         false, // false
-  errorDataPath:    'object', // 'object'
-  jsonPointers:     true, // false
-  messages:         true, // true
-  v5:               true, // true
+  // validation and reporting options
+  v5:                   true, // true
+  allErrors:            true, // false
+  verbose:              true, // false
+  jsonPointers:         true, // false
+  uniqueItems:          true, // true
+  unicode:              true, // true
+  format:               'fast', // 'fast'
+  formats:              {}, // {}
+  schemas:              {}, // {}
+
+  // referenced schema options
+  missingRefs:          true, // true
+  loadSchema:           undefined, // undefined
+
+  // options to modify validated data
+  removeAdditional:     false, // false
+  useDefaults:          true, // false
+  coerceTypes:          false, // false
+
+  // asynchronous validation options
+  async:                undefined, // undefined
+  transpile:            undefined, // undefined
+
+  // advanced options
+  meta:                 true, // true
+  validateSchema:       'log', // true
+  addUsedSchema:        true, // true
+  inlineRefs:           true, // true
+  passContext:          true, // true
+  loopRequired:         Infinity, // Infinity
+  multipleOfPrecision:  false, // false
+  errorDataPath:        'object', // 'object'
+  messages:             true, // true
+  beautify:             false, // false
 }
 
 try {
