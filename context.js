@@ -42,8 +42,8 @@ context.addFormat('undefined', {
 
 // ltgt macros
 function ltgtKeyword(op) {
-  var minimum = op[0] === 'g'
-  var exclusive = op[2] !== 'e'
+  var minimum = op[0] === 'g' // gt | gte
+  var exclusive = op[2] !== 'e' // gte | lte
 
   context.addKeyword(op, {
     macro: function (value) {
@@ -134,6 +134,5 @@ try {
     compare: semver.compare
   })
 }
-catch (err) {
-}
+catch (err) {}
 
