@@ -76,7 +76,7 @@ function ltgtKeyword(op) {
       // TODO: else if (typeof value === '...')?
       else {
         valKey = 'formatM' + suffix
-        excKey = 'exclusiveFormatM' + suffix
+        excKey = 'formatExclusiveM' + suffix
       }
 
       var schema = {}
