@@ -1,6 +1,6 @@
 {
   "name": "@query/schema",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Concise url-safe query language that compiles to JSON Schema",
   "main": "index.js",
   "scripts": {
